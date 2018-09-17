@@ -3,6 +3,7 @@ import React from 'react'
 const AddForm = ({ lisaaNimi, newName, handleNameChange, newNumber, handleNumberChange }) => {
 
   return (
+    
   <form onSubmit={lisaaNimi}>
   <div>
     nimi: <input

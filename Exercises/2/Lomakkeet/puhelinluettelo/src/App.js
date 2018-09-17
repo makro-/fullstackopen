@@ -2,21 +2,12 @@ import React from 'react';
 import Person from './components/Person'
 import Filter from './components/Filter'
 import AddForm from './components/AddForm'
-
+import axios from 'axios'
 class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      persons: [
-        { name: 'Arto Hellas',
-        numero: '0445033711'
-       },
-       { name: 'Pena Munkki',
-        numero: '0445033711'
-       }
-
-      ],
-      
+      persons: [],
       newName: '',
       newNumber: '',
       filter: ''
@@ -54,6 +45,14 @@ class App extends React.Component {
   {
 
        this.setState({filter: event.target.value})
+
+  }
+
+  componentDidMount() {
+    axios.get('http://localhost:3001/persons').then(response => {
+    console.log('promise fulfilled')
+  this.setState({ persons: response.data })
+})
 
   }
   render() {
