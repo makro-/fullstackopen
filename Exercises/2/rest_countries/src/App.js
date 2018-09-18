@@ -30,17 +30,43 @@ class App extends React.Component {
     this.setState({ searchTerm: event.target.value })
   }
   
+  getCountryData(){
+
+    const countries = this.state.countries.filter ( x => x.name.toLowerCase().includes(this.state.searchTerm));
+    if(countries.length === 1)
+    {
+      return countries.map( c => 
+      <div key={c.name}> {c.name} {c.nativeName}<p>capital: {c.capital}</p><p>population: {c.population}</p><p><img src={c.flag} alt="flag"/></p> </div>
+      
+      )
+      
+    }
+    else if(countries.length < 10)
+    {
+      return   countries.map( c => <div key={c.name}> {c.name} </div>)
+    } 
+    else{
+      return "Too many matches, specify more "
+    }
+  }
   
   render() {
-    const countriesToShow = this.state.countries.filter ( x => x.name.toLowerCase().includes(this.state.searchTerm));
+    
     return (
       <div>
+        <div>
         Find countries: 
        <input 
             value={this.state.searchTerm} 
             onChange={this.handleSearchChange}
           />
-          {countriesToShow.map( c => <div key={c.name}> {c.name} </div>)}
+          
+          </div>
+          <div>
+
+            {this.getCountryData()}
+
+          </div>
       </div>
       
             
