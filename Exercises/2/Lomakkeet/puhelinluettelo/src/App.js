@@ -3,7 +3,7 @@ import Person from './components/Person'
 import Filter from './components/Filter'
 import AddForm from './components/AddForm'
 import Persons from './components/Persons'
-
+import Notification from './components/Notification'
 
 class App extends React.Component {
   constructor(props) {
@@ -12,7 +12,8 @@ class App extends React.Component {
       persons: [],
       newName: '',
       newNumber: '',
-      filter: ''
+      filter: '',
+      notification: null
     }
   }
 
@@ -22,38 +23,79 @@ class App extends React.Component {
    const found = this.state.persons.some( person => person.name === this.state.newName )
    if(found)
    {
-     alert("Already added")
+     //alert("Already added")
+     const result = window.confirm(this.state.newName + ' on jo luettelossa, korvataanko vanha numero uudella?')
+     if(result){
+       const personToUpdate = this.state.persons.find( p => p.name === this.state.newName) 
+       console.log('person to update: ', personToUpdate)
+       const newPerson = {
+        name: this.state.newName,
+          number: this.state.newNumber,
+        id: personToUpdate.id
+      }
+       Persons.updatePerson( newPerson)
+       .then( response => {
+         this.setState(
+           {
+              persons: this.state.persons.map( person => person.id !== personToUpdate.id ? person : response.data  ),
+              newName: '',
+              newNumber: '',
+              filter:'',
+              notification: 'Päivitettiin ' + personToUpdate.name
+           }) 
+           setTimeout(() => {
+             this.setState({notification: null})}, 3000)
+           
+       })
+       .catch( error => {
+        this.setState(
+          {
+             persons: this.state.persons.filter(person => person.id != personToUpdate.id ),
+             newName: '',
+             newNumber: '',
+             filter:'',
+             notification: 'Henkilö on jo poistettu palvelimelta ' + personToUpdate.name
+          }) 
+          setTimeout(() => {
+            this.setState({notification: null})}, 3000)
+          
+       })
+     }
+
    }
    else{
-     const newPerson = {
-       name: this.state.newName,
-        number: this.state.newNumber
-       
-     }
-    Persons.addPerson( newPerson)
-     .then(response => {
-       console.log(response)
-       this.setState(
-        {
-         persons: this.state.persons.concat(response),
-         newName: '',
-         newNumber: '',
-         filter:''
-        }
-      )
-     })
+      const newPerson = {
+        name: this.state.newName,
+          number: this.state.newNumber
+        
+      }
+      Persons.addPerson( newPerson)
+      .then(response => {
+        console.log('added person', response)
+        this.setState(
+          {
+          persons: this.state.persons.concat(response),
+          newName: '',
+          newNumber: '',
+          filter:'',
+          notification: 'Lisättiin ' + newPerson.name
+          }
+            )
+            setTimeout(() => {
+              this.setState({notification: null})}, 3000)
+        })
 
 
 
-  
-   }
+      
+      }
     
   }
 
   deletePerson = (event) =>
   {
     const personid = event.target.dataset.message
-    console.log(personid)
+    console.log('deleting person', personid)
     const persontodelete = this.state.persons.find( p => p.id == personid)
     const result = window.confirm('Poistetaanko ' + persontodelete.name + '?')
     if(result)
@@ -71,8 +113,11 @@ class App extends React.Component {
         persons: newArray,
         newName: '',
         newNumber: '',
-        filter: ''
+        filter: '',
+        notification: 'Poistettiin ' + persontodelete.name
       })
+      setTimeout(() => {
+        this.setState({notification: null})}, 3000)
     })
     }
    
@@ -106,6 +151,7 @@ class App extends React.Component {
     const matches = this.state.persons.filter( x => x.name.toLowerCase().includes(this.state.filter.toLowerCase()))
     return (
       <div>
+        <Notification message={this.state.notification}/>
         <h2>Puhelinluettelo</h2>
         <Filter handler={this.handleFilterChange} />
 

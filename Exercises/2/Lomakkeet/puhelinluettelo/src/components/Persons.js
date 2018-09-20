@@ -10,7 +10,12 @@ const getPersons = () => {
     return axios.get(baseUrl).then(r => {return  r.data } )
 }
 const deletePerson = (personID) => {
-    console.log(personID)
+    console.log('Persons.js deletePerson', personID)
     return axios.delete(baseUrl + '/' + personID)
 }
-export default { addPerson, getPersons, deletePerson }
+const updatePerson = ( person ) => {
+    console.log('Persons.updatePerson', person)
+   return axios.put(`${baseUrl}/${person.id}` , person)
+
+}
+export default { addPerson, getPersons, deletePerson,updatePerson }
